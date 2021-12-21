@@ -1,0 +1,138 @@
+```{r}
+##### LOAD PACKAGES
+library("sas7bdat")
+library("data.table")
+library("dplyr")
+library("haven")
+
+##### LOAD DATASET
+BP <- read.sas7bdat("C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/mage.sas7bdat")
+PFAS_PCA <- read.sas7bdat("C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS_PCA.sas7bdat")
+
+```
+
+```{r}
+##### DROP OUTLIER OBSERVATIONS
+summary(BP$sys)
+hist(BP$sys)
+bp_sys <- boxplot(BP$sys)
+bp_sys$stats
+summary(BP$dias)
+hist(BP$dias)
+bp_dias <- boxplot(BP$dias)
+bp_dias$stats
+
+#BP_0 <- subset(BP, sys<=160 & sys>=80 & dias<=100 & dias>=40)
+
+##### DROP 1ST TRIMESTER BP MEASURES
+BP_0 <- subset(BP, ga_days >84) # 4028 1ST TRIMESTER MEASURES DROPPED
+
+##### COUNT NUMBER OF DUPLICATED IDs
+setDT(BP_0)[, count := uniqueN(ga_days), by = aid]
+BP_0$dup_num <- length(unique(BP_0$ga_days)) == nrow(BP_0)
+BP_0$dup_num <- sequence(table(BP_0$aid))
+
+##### MEAN-CENTER GESTATIONAL AGE
+BP_0$ga_days_sc <- scale(BP_0$ga_days, scale=FALSE)
+
+```
+
+```{r}
+##### DROP INDIVIUDALS IF THEY HAVE LESS THAN 4 BP MEASURES
+BP_1 <- subset(BP_0, BP_0$count >=4)
+
+##### RESHAPE DATA
+BP_W <- reshape(BP_1, idvar = "aid", timevar = "dup_num", direction = "wide")
+BP_W$age <- BP_W$mom_agey_bp.1
+BP_W <- BP_W %>% select(-contains("mom_agey_bp"))
+
+##### DROP PEOPLE WHOSE 1ST BP MEASURE OCCURED IN THE THIRD TRIMESTER (N = 2)
+BP_W <- subset(BP_W, ga_days.1 <= 182) # DROP PEOPLE WHOSE 1ST BP MEASURE OCCURED IN THE THIRD TRIMESTER (N = 2)
+
+##### MERGE DATASETS
+PFASBP_W <- merge(BP_W, PFAS_PCA, by = "aid")
+PFASBP_L <- merge(BP_1, PFAS_PCA, by = "aid")
+
+```
+
+```{r}
+##### ADD A WEEKLY SCALE
+PFASBP_L$ga_w <- ifelse(PFASBP_L$ga_days >84 & PFASBP_L$ga_days <=91, 13,
+                         ifelse(PFASBP_L$ga_days >91 & PFASBP_L$ga_days <=98, 14,
+                                ifelse(PFASBP_L$ga_days >98 & PFASBP_L$ga_days <=105, 15,
+                                       ifelse(PFASBP_L$ga_days >105 & PFASBP_L$ga_days <=112, 16,
+                                              ifelse(PFASBP_L$ga_days >112 & PFASBP_L$ga_days <=119, 17,
+                                                     ifelse(PFASBP_L$ga_days >119 & PFASBP_L$ga_days <=126, 18,
+                                                            ifelse(PFASBP_L$ga_days >126 & PFASBP_L$ga_days <=133, 19, 
+                                                                   ifelse(PFASBP_L$ga_days >133 & PFASBP_L$ga_days <=140, 20, 
+                                                                          ifelse(PFASBP_L$ga_days >140 & PFASBP_L$ga_days <=147, 21,
+                                                                                 ifelse(PFASBP_L$ga_days >147 & PFASBP_L$ga_days <=154, 22, 
+                                                                                        ifelse(PFASBP_L$ga_days >154 & PFASBP_L$ga_days <=161, 23,
+                                                                                            ifelse(PFASBP_L$ga_days >161 & PFASBP_L$ga_days <=168, 24,
+                         ifelse(PFASBP_L$ga_days >168 & PFASBP_L$ga_days <=175, 25,
+                                ifelse(PFASBP_L$ga_days >175 & PFASBP_L$ga_days <=182, 26,
+                                       ifelse(PFASBP_L$ga_days >182 & PFASBP_L$ga_days <=189, 27,
+                                              ifelse(PFASBP_L$ga_days >189 & PFASBP_L$ga_days <=196, 27,
+                                                     ifelse(PFASBP_L$ga_days >196 & PFASBP_L$ga_days <=203, 29,
+                                                            ifelse(PFASBP_L$ga_days >203 & PFASBP_L$ga_days <=210, 30, 
+                                                                   ifelse(PFASBP_L$ga_days >210 & PFASBP_L$ga_days <=217, 31, 
+                                                                          ifelse(PFASBP_L$ga_days >217 & PFASBP_L$ga_days <=224, 32,
+                                                                                 ifelse(PFASBP_L$ga_days >224 & PFASBP_L$ga_days <=231, 33, 
+                                                                                        ifelse(PFASBP_L$ga_days >231 & PFASBP_L$ga_days <=238, 34,
+                         ifelse(PFASBP_L$ga_days >238 & PFASBP_L$ga_days <=245, 35,
+                                ifelse(PFASBP_L$ga_days >245 & PFASBP_L$ga_days <=252, 36,
+                                       ifelse(PFASBP_L$ga_days >252 & PFASBP_L$ga_days <=259, 37,
+                                              ifelse(PFASBP_L$ga_days >259 & PFASBP_L$ga_days <=266, 38,
+                                                     ifelse(PFASBP_L$ga_days >266 & PFASBP_L$ga_days <=273, 39,
+                                                            ifelse(PFASBP_L$ga_days >273 & PFASBP_L$ga_days <=280, 40, 
+                                                                   ifelse(PFASBP_L$ga_days >280 & PFASBP_L$ga_days <=287, 41, 
+                                                                          ifelse(PFASBP_L$ga_days >287 & PFASBP_L$ga_days <=294, 42,
+                                                                                 ifelse(PFASBP_L$ga_days >294 & PFASBP_L$ga_days <=301, 43, 0)))))))))))))))))))))))))))))))
+summary(PFASBP_L$ga_w)
+
+PFASBP_L <- group_by(PFASBP_L, aid, ga_w)
+BP_w <- summarise(PFASBP_L, ga_w_sys = mean(sys, na.rm = TRUE),
+                            ga_w_dias = mean(dias, na.rm = TRUE))
+PFASBP_L <- ungroup(PFASBP_L)
+
+PFASBP_L <- PFASBP_L %>% right_join(BP_w)
+
+##### MEAN-CENTER GESTATIONAL AGE
+PFASBP_L$ga_w_sc <- scale(PFASBP_L$ga_w, scale=FALSE)
+
+```
+
+```{r}
+##### ADD A MONTHLY SCALE
+PFASBP_L$ga_m <- ifelse(PFASBP_L$ga_days >84 & PFASBP_L$ga_days <=114, 3,
+                         ifelse(PFASBP_L$ga_days >114 & PFASBP_L$ga_days <=144, 4,
+                                ifelse(PFASBP_L$ga_days >144 & PFASBP_L$ga_days <=174, 5,
+                                       ifelse(PFASBP_L$ga_days >174 & PFASBP_L$ga_days <=204, 6,
+                                              ifelse(PFASBP_L$ga_days >204 & PFASBP_L$ga_days <=234, 7,
+                                                     ifelse(PFASBP_L$ga_days >234 & PFASBP_L$ga_days <=264, 8,
+                                                            ifelse(PFASBP_L$ga_days >264 & PFASBP_L$ga_days <=294, 9, 
+                                                                   ifelse(PFASBP_L$ga_days >294 & PFASBP_L$ga_days <=324, 10, 0))))))))
+summary(PFASBP_L$ga_m)
+
+PFASBP_L <- group_by(PFASBP_L, aid, ga_m)
+BP_m <- summarise(PFASBP_L, ga_m_sys = mean(sys, na.rm = TRUE),
+                            ga_m_dias = mean(dias, na.rm = TRUE))
+PFASBP_L <- ungroup(PFASBP_L)
+
+PFASBP_L <- PFASBP_L %>% right_join(BP_m)
+
+##### MEAN-CENTER GESTATIONAL AGE
+PFASBP_L$ga_m_sc <- scale(PFASBP_L$ga_m, scale=FALSE)
+
+```
+
+
+```{r}
+##### SAVE DATASET
+write.csv(PFASBP_L, file = "C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS_L.csv", row.names = T)
+write_sas(PFASBP_L, "C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS_L.sas7bdat")
+
+write.csv(PFASBP_W, file = "C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS_W.csv", row.names = T)
+#write_sas(PFASBP_W, "C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS_W.sas7bdat")
+
+```
