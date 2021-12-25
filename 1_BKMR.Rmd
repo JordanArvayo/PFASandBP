@@ -16,7 +16,6 @@ PFAS_DIAS <- read.csv("C:/Users/jarva/Desktop/James-Todd Lab/PFASandBP/Data/PFAS
 hist(PFAS_SYS$a_sys)
 hist(PFAS_DIAS$a_dias)
 
-
 ```
 
 ```{r}
@@ -37,11 +36,8 @@ PFAS_DIAS$LNET_PFOSA_Z <- scale(PFAS_DIAS$LNET_PFOSA)
 
 ```
 
-
-
 ```{r}
-##### RENAME AND RELABLE 
-
+##### RENAME VARIABLES IN THE SYSTOLIC BP DATASET
 PFAS_SYS$age <- PFAS_SYS$mom_agey_bp
 PFAS_SYS$exer <- PFAS_SYS$mod_pre_d + PFAS_SYS$vig_pre_d
 PFAS_SYS$edu <- PFAS_SYS$coll_grad
@@ -51,7 +47,7 @@ PFAS_SYS$income <- PFAS_SYS$income_hh_epq_epqa_d
 PFAS_SYS$parity <- PFAS_SYS$parity_d
 PFAS_SYS$race <- PFAS_SYS$race2_mom_epi_epia_d
 
-##### RELABEL 
+# RELABEL 
 PFAS_SYS$edu <- ifelse(PFAS_SYS$edu == 0, 1,
                          ifelse(PFAS_SYS$edu == 1, 0, 1))
 PFAS_SYS$bmi_cat <- ifelse(PFAS_SYS$bmi <25, 0, 1)
@@ -73,7 +69,7 @@ PFAS_SYS$race <- ifelse(PFAS_SYS$race == "white", 0,
                         ifelse(PFAS_SYS$race == "other", 4,
                         ifelse(PFAS_SYS$race == "more than 1 race", 5, 5))))))
 
-##### REFACTOR
+# REFACTOR
 #PFAS_SYS$race <- factor(PFAS_SYS$race,
 #                        levels = c(0, 1, 2, 3, 4, 5),
 #                        labels = c("White", "Black", "Hispanic", "Asian", "Other", "More than 1 race"))
@@ -93,14 +89,21 @@ PFAS_SYS$race <- ifelse(PFAS_SYS$race == "white", 0,
 #                          levels = c(0, 1),
 #                          labels = c("Nulliparous", "Parous"))
 
+# SET CATEGORICAL VARIABLES AS FACTORS
 PFAS_SYS$edu <- as.factor(PFAS_SYS$edu)
 PFAS_SYS$smoke <- as.factor(PFAS_SYS$smoke)
 PFAS_SYS$income_cat <- as.factor(PFAS_SYS$income_cat)
 PFAS_SYS$parity <- as.factor(PFAS_SYS$parity)
 PFAS_SYS$race <- as.factor(PFAS_SYS$race)
 
+# CENTER AND SCALE CONTINUOUS VARIABLES
+PFAS_SYS$age <- scale(PFAS_SYS$age)
+PFAS_SYS$bmi <- scale(PFAS_SYS$bmi)
+PFAS_SYS$exer <- scale(PFAS_SYS$exer)
 
 
+
+##### RENAME VARIABLES IN THE DIASOLIC BP DATASET
 PFAS_DIAS$age <- PFAS_DIAS$mom_agey_bp
 PFAS_DIAS$exer <- PFAS_DIAS$mod_pre_d + PFAS_DIAS$vig_pre_d
 PFAS_DIAS$edu <- PFAS_DIAS$coll_grad
@@ -110,7 +113,7 @@ PFAS_DIAS$income <- PFAS_DIAS$income_hh_epq_epqa_d
 PFAS_DIAS$parity <- PFAS_DIAS$parity_d
 PFAS_DIAS$race <- PFAS_DIAS$race2_mom_epi_epia_d
 
-##### RE-LABEL 
+# RE-LABEL 
 PFAS_DIAS$edu <- ifelse(PFAS_DIAS$edu == 0, 1,
                          ifelse(PFAS_DIAS$edu == 1, 0, 1))
 PFAS_DIAS$bmi_cat <- ifelse(PFAS_DIAS$bmi <25, 0, 1)
@@ -132,7 +135,7 @@ PFAS_DIAS$race <- ifelse(PFAS_DIAS$race == "white", 0,
                         ifelse(PFAS_DIAS$race == "other", 4,
                         ifelse(PFAS_DIAS$race == "more than 1 race", 5, 5))))))
 
-##### REFACTOR
+# REFACTOR
 #PFAS_DIAS$race <- factor(PFAS_DIAS$race,
 #                        levels = c(0, 1, 2, 3, 4, 5),
 #                        labels = c("White", "Black", "Hispanic", "Asian", "Other", "More than 1 race"))
@@ -152,13 +155,17 @@ PFAS_DIAS$race <- ifelse(PFAS_DIAS$race == "white", 0,
 #                          levels = c(0, 1),
 #                          labels = c("Nulliparous", "Parous"))
 
+# SET CATEGORICAL VARIABLES AS FACTORS
 PFAS_DIAS$edu <- as.factor(PFAS_DIAS$edu)
 PFAS_DIAS$smoke <- as.factor(PFAS_DIAS$smoke)
 PFAS_DIAS$income_cat <- as.factor(PFAS_DIAS$income_cat)
 PFAS_DIAS$parity <- as.factor(PFAS_DIAS$parity)
 PFAS_DIAS$race <- as.factor(PFAS_DIAS$race)
 
-
+# CENTER AND SCALE CONTINUOUS VARIABLES)
+PFAS_DIAS$age <- scale(PFAS_DIAS$age)
+PFAS_DIAS$bmi <- scale(PFAS_DIAS$bmi)
+PFAS_DIAS$exer <- scale(PFAS_DIAS$exer)
 
 ```
 
@@ -170,7 +177,6 @@ PFAS_DIAS$race <- as.factor(PFAS_DIAS$race)
 
 ```
 
-
 ```{r}
 ##### BKMR WITH LOG-TRANSFORMED PFAS #####
 mixture_sys <- as.matrix(PFAS_SYS[,29:34]) # THESE PFASs ARE LOG-TRANSFORMED
@@ -181,10 +187,10 @@ c_sys <- PFAS_SYS$c_sys
 a_dias <- PFAS_DIAS$a_dias
 c_dias <- PFAS_DIAS$c_dias
 
-cov_sys <- as.matrix(cbind(PFAS_SYS$age, PFAS_SYS$exer, PFAS_SYS$income_cat, PFAS_SYS$parity, PFAS_SYS$bmi, PFAS_SYS$race))
-cov_dias <- as.matrix(cbind(PFAS_DIAS$age, PFAS_DIAS$exer, PFAS_DIAS$income_cat, PFAS_DIAS$parity, PFAS_DIAS$bmi, PFAS_DIAS$race))
-cov_sys_nr <- as.matrix(cbind(PFAS_SYS$age, PFAS_SYS$exer, PFAS_SYS$income_cat, PFAS_SYS$parity, PFAS_SYS$bmi))
-cov_dias_nr <- as.matrix(cbind(PFAS_DIAS$age, PFAS_DIAS$exer, PFAS_DIAS$income_cat, PFAS_DIAS$parity, PFAS_DIAS$bmi))
+cov_sys <- as.matrix(cbind(PFAS_SYS$age, PFAS_SYS$edu, PFAS_SYS$exer, PFAS_SYS$income_cat, PFAS_SYS$parity, PFAS_SYS$bmi, PFAS_SYS$race))
+cov_dias <- as.matrix(cbind(PFAS_DIAS$age, PFAS_SYS$edu, PFAS_DIAS$exer, PFAS_DIAS$income_cat, PFAS_DIAS$parity, PFAS_DIAS$bmi, PFAS_DIAS$race))
+cov_sys_nr <- as.matrix(cbind(PFAS_SYS$age, PFAS_DIAS$edu, PFAS_SYS$exer, PFAS_SYS$income_cat, PFAS_SYS$parity, PFAS_SYS$bmi))
+cov_dias_nr <- as.matrix(cbind(PFAS_DIAS$age, PFAS_DIAS$edu, PFAS_DIAS$exer, PFAS_DIAS$income_cat, PFAS_DIAS$parity, PFAS_DIAS$bmi))
 
 set.seed(10)
 knots_sys <- fields::cover.design(mixture_sys, nd = 120)$design
@@ -214,15 +220,12 @@ beep(sound=5, expr=NULL)
 summary(m14_c_sys)
 ExtractPIPs(m14_c_sys)
 
-
 ```
-
-
 
 ```{r}
 ##### VALUES TO KEEP AFTER BURIN/THIN
 #
-sel <- seq(0,1000,by = 1)
+sel <- seq(0,25000,by = 50)
 
 ##### ACCESS CONVERGENCE WITH TRACEPLOTS
 TracePlot(fit = m11_a_sys, par = "beta", sel = sel)
@@ -231,11 +234,154 @@ TracePlot(fit = m13_c_sys, par = "beta", sel = sel)
 TracePlot(fit = m14_c_sys, par = "beta", sel = sel)
 
 
-TracePlot(fit = m12_a_sys, par = "beta", sel = sel)
-TracePlot(fit = m12_a_sys, par = "sigsq.eps", sel = sel)
+##### VALUES TO KEEP AFTER BURNING/THIN (ACCORDING TO THE TRACEPLOT FUNCTION ABOVE)
+sel_m11_a_sys <- seq(5001, 25000, 50)
+TracePlot(fit = m11_a_sys, par = "beta", sel = sel_m11_a_sys)
+TracePlot(fit = m11_a_sys, par = "sigsq.eps", sel = sel_m11_a_sys)
 
-densplot(m12_a_sys)
+sel_m12_a_sys <- seq(5001, 25000, 50)
+TracePlot(fit = m12_a_sys, par = "beta", sel = sel_m12_a_sys)
+TracePlot(fit = m12_a_sys, par = "sigsq.eps", sel = sel_m12_a_sys)
 
+sel_m13_c_sys <- seq(5001, 25000, 50)
+TracePlot(fit = m13_c_sys, par = "beta", sel = sel_m13_c_sys)
+TracePlot(fit = m13_c_sys, par = "sigsq.eps", sel = sel_m13_c_sys)
+
+sel_m14_c_sys <- seq(5001, 25000, 50)
+TracePlot(fit = m14_c_sys, par = "beta", sel = sel_m14_c_sys)
+TracePlot(fit = m14_c_sys, par = "sigsq.eps", sel = sel_m14_c_sys)
+
+```
+
+```{r}
+##### PREDICT UNIVARIATE EXPOSURE-RESPONSE FUNCTION
+pred_univar_m11_a_sys <- PredictorResponseUnivar(fit = m11_a_sys, sel = sel_m11_a_sys, method = "approx")
+pred_univar_m11_a_sys
+
+pred_univar_m12_a_sys <- PredictorResponseUnivar(fit = m12_a_sys, sel = sel_m12_a_sys, method = "approx")
+pred_univar_m12_a_sys
+
+pred_univar_m13_c_sys <- PredictorResponseUnivar(fit = m13_c_sys, sel = sel_m13_c_sys, method = "approx")
+pred_univar_m13_c_sys
+
+pred_univar_m14_c_sys <- PredictorResponseUnivar(fit = m14_c_sys, sel = sel_m14_c_sys, method = "approx")
+pred_univar_m14_c_sys
+
+
+##### PLOT UNIVARIATE EXPOSURE-RESPONSE FUNCTION
+m1 <- ggplot(pred_univar_m11_a_sys, aes(z, est, ymin = est - 1.96*se, ymax = est + 1.96*se)) +
+  geom_smooth(stat = "identity") + ylab("h(z)") + facet_wrap(~ variable)
+m1
+
+m2 <- ggplot(pred_univar_m12_a_sys, aes(z, est, ymin = est - 1.96*se, ymax = est + 1.96*se)) +
+  geom_smooth(stat = "identity") + ylab("h(z)") + facet_wrap(~ variable)
+m2
+
+m3 <- ggplot(pred_univar_m13_c_sys, aes(z, est, ymin = est - 1.96*se, ymax = est + 1.96*se)) +
+  geom_smooth(stat = "identity") + ylab("h(z)") + facet_wrap(~ variable)
+m3
+
+m4 <- ggplot(pred_univar_m14_c_sys, aes(z, est, ymin = est - 1.96*se, ymax = est + 1.96*se)) +
+  geom_smooth(stat = "identity") + ylab("h(z)") + facet_wrap(~ variable)
+m4
+
+```
+
+```{r}
+##### PREDICT INTERACTIONS BETWEEN EXPOSURE AND RESPONSE
+pred_bivar_m11_a_sys <- PredictorResponseBivar(fit = m11_a_sys, min.plot.dist = 1, sel = sel_m11_a_sys, method = "approx")
+pred_interact_m11_a_sys <- PredictorResponseBivarLevels(pred.resp.df = pred_bivar_m11_a_sys, Z = mixture_sys,
+                                                        both_pairs = T, qs = c(0.25, 0.50, 0.75))
+pred_interact_m11_a_sys
+
+pred_bivar_m12_a_sys <- PredictorResponseBivar(fit = m12_a_sys, min.plot.dist = 1, sel = sel_m12_a_sys, method = "approx")
+pred_interact_m12_a_sys <- PredictorResponseBivarLevels(pred.resp.df = pred_bivar_m12_a_sys, Z = mixture_sys,
+                                                        both_pairs = T, qs = c(0.25, 0.50, 0.75))
+pred_interact_m12_a_sys
+
+
+pred_bivar_m13_c_sys <- PredictorResponseBivar(fit = m13_c_sys, min.plot.dist = 1, sel = sel_m13_c_sys, method = "approx")
+pred_interact_m13_c_sys <- PredictorResponseBivarLevels(pred.resp.df = pred_bivar_m13_c_sys, Z = mixture_sys, both_pairs = T, qs = c(0.25, 0.50, 0.75))
+pred_interact_m13_c_sys
+
+
+pred_bivar_m14_c_sys <- PredictorResponseBivar(fit = m14_c_sys, min.plot.dist = 1, sel = sel_m14_c_sys, method = "approx")
+pred_interact_m14_c_sys <- PredictorResponseBivarLevels(pred.resp.df = pred_bivar_m14_c_sys, Z = mixture_sys, both_pairs = T, qs = c(0.25, 0.50, 0.75))
+pred_interact_m14_c_sys
+
+##### PLOT INTERACTIONS BETWEEN EXPOSURE AND RESPONSE
+m11 <- ggplot(pred_interact_m11_a_sys, aes(z1, est)) +
+  geom_smooth(aes(col = quantile), stat = "identity") + 
+  facet_grid(variable2 ~ variable1) +
+  xlab ("PFAS1") +
+  ggtitle("h(PFAS1 | quantiles of PFAS2)") 
+m11
+
+
+m22 <- ggplot(pred_interact_m12_a_sys, aes(z1, est)) +
+  geom_smooth(aes(col = quantile), stat = "identity") + 
+  facet_grid(variable2 ~ variable1) +
+  xlab ("PFAS1") +
+  ggtitle("h(PFAS1 | quantiles of PFAS2)") 
+m22
+
+
+m33 <- ggplot(pred_interact_m13_c_sys, aes(z1, est)) +
+  geom_smooth(aes(col = quantile), stat = "identity") + 
+  facet_grid(variable2 ~ variable1) +
+  xlab ("PFAS1") +
+  ggtitle("h(PFAS1 | quantiles of PFAS2)") 
+m33
+
+
+m44 <- ggplot(pred_interact_m14_c_sys, aes(z1, est)) +
+  geom_smooth(aes(col = quantile), stat = "identity") + 
+  facet_grid(variable2 ~ variable1) +
+  xlab ("PFAS1") +
+  ggtitle("h(PFAS1 | quantiles of PFAS2)") 
+m44
+
+```
+
+```{r}
+##### DETERMINE RISK ASSOCIATED WITH THE OVERALL MIXTURE
+risk_overall_m11_a_sys <- OverallRiskSummaries(fit = m11_a_sys, q.fixed = 0.50, sel = sel_m11_a_sys,method = "approx", qs = seq(0.25, 0.75, by = 0.05))
+risk_overall_m11_a_sys
+
+risk_overall_m12_a_sys <- OverallRiskSummaries(fit = m12_a_sys, q.fixed = 0.50, sel = sel_m12_a_sys, method = "approx", qs = seq(0.25, 0.75, by = 0.05))
+risk_overall_m12_a_sys
+
+risk_overall_m13_c_sys <- OverallRiskSummaries(fit = m13_c_sys, q.fixed = 0.50, sel = sel_m13_c_sys, method = "approx", qs = seq(0.25, 0.75, by = 0.05))
+risk_overall_m13_c_sys
+
+risk_overall_m14_c_sys <- OverallRiskSummaries(fit = m14_c_sys, q.fixed = 0.50, sel = sel_m14_c_sys, method = "approx", qs = seq(0.25, 0.75, by = 0.05))
+risk_overall_m14_c_sys
+
+##### PLOT RISK ASSOCIATED WITH THE OVERALL MIXTURE
+m111 <- ggplot(risk_overall_m11_a_sys, aes(quantile, est, ymin = est - 1.96*sd, ymax = est + 1.96*sd)) +
+               geom_hline(yintercept = 00, linetype = "dashed", color = "dark blue") +
+               geom_pointrange() +
+               scale_y_continuous(name = "estimate")
+m111
+
+m222 <- ggplot(risk_overall_m12_a_sys, aes(quantile, est, ymin = est - 1.96*sd, ymax = est + 1.96*sd)) +
+               geom_hline(yintercept = 00, linetype = "dashed", color = "dark blue") +
+               geom_pointrange() +
+               scale_y_continuous(name = "estimate")
+m222
+
+m333 <- ggplot(risk_overall_m13_c_sys, aes(quantile, est, ymin = est - 1.96*sd, ymax = est + 1.96*sd)) +
+               geom_hline(yintercept = 00, linetype = "dashed", color = "dark blue") +
+               geom_pointrange() +
+               scale_y_continuous(name = "estimate")
+m333
+
+
+m444 <- ggplot(risk_overall_m14_c_sys, aes(quantile, est, ymin = est - 1.96*sd, ymax = est + 1.96*sd)) +
+               geom_hline(yintercept = 00, linetype = "dashed", color = "dark blue") +
+               geom_pointrange() +
+               scale_y_continuous(name = "estimate")
+m444
 
 ```
 
